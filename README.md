@@ -1,18 +1,27 @@
-# Introdution
-This repo is the code for human-AI experiments on Overcooked for [COLE-JAIR](https://sites.google.com/view/cole-jair).
+# README
 
-This repo is based on the code of [PECAN](https://github.com/LxzGordon/PECAN).
+Welcome to the official GitHub repository for the research paper "Tackling Cooperative Incompatibility for Zero-Shot Human-AI Coordination". This paper, submitted to the Special Track on Hybrid Human-Artificial Intelligence in the Journal of Artificial Intelligence Research (JAIR), is an extension of the paper [Cooperative Open-ended Learning Framework for Zero-shot Coordination](https://arxiv.org/abs/2302.04831), which was accepted by ICML 2023.
 
-We integrate [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) agent models with the [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) framework for convenient human-ai coordination study on Overcooked. Changes are done under the [overcookedgym/overcooked-flask](https://github.com/LxzGordon/pecan_human_AI_coordination/tree/master/overcookedgym/overcooked-flask) directory.
+You can access our hands-on [demo page](https://sites.google.com/view/cole-jair).
+
+This repository introduces a human-AI evaluation platform built around the Overcooked game, designed to support Human-AI experiments. Overcooked, a two-player fully cooperative game. The system is shown as follows.
+
 <p align="center">
-  <img src="./images/pecan_uni.gif" width="40%">
-  <img src="./images/pecan_simple.gif" width="40%">
+  <img src="./images/system_model.png" width="90%">
   <br>
 </p>
+Here, you're granted the ability to:
 
-# Instruction for usage
+- Upload your weights
+- Customize the human questionnaire
+- Configure game settings
+- And many more!
 
-## 1. Create conda environment & Install libraries
+Our codebase is a modified version of the [PECAN](https://github.com/LxzGordon/PECAN) repository, adapted to better suit our specific research needs. Besides, we integrate [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) agent models with the [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) framework for convenient human-ai coordination study on Overcooked. Changes are done under the [overcookedgym/overcooked-flask](https://github.com/LxzGordon/pecan_human_AI_coordination/tree/master/overcookedgym/overcooked-flask) directory.
+
+# Getting Started
+
+## 1. How to setup
 Install [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) in this repo
  ```shell
     conda create -n overcooked-vis python=3.7
@@ -48,7 +57,7 @@ Install human_aware_rl and its dependencies: overcooked_ai, baselines & stable_b
 
 ## 2. How to load models
 
-You need to put your model file in `./models`. You can get our trained models [here](https://drive.google.com/drive/folders/1s88a_muyG6pVlfcKDKop6R1Fhxr8dcGH?usp=share_link).
+You need to put your model file in `./models`. You can get our trained models [here](https://drive.google.com/drive/folders/1s88a_muyG6pVlfcKDKop6R1Fhxr8dcGH?usp=share_link), including BC, self-play, population-based training, [FCP](https://arxiv.org/abs/2110.08176), [MEP](https://arxiv.org/abs/2112.11701), [COLE](https://arxiv.org/abs/2302.04831).
 
 In addition, you can load your own models if they are trained using the [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) framework. 
 Agents are loaded using the `get_agent_from_saved_model()` method, which loads tensorflow predictor models (`.pb` files), so you should save your agents in this style if you wish to load them into our framework. You can reference to the `save` method in `human_aware_rl/pbt/pbt.py` for saving agents that can be loaded.
@@ -74,7 +83,7 @@ To load your own models, you need to put them in the `./models` folder in a name
   ...
 ``` 
 
-## 3. Start a process
+## 3. How to run
 
 ```shell
 python overcookedgym/overcooked-flask/app.py --trajs_savepath ./trajs --ckpts ./models
@@ -86,7 +95,7 @@ python overcookedgym/overcooked-flask/app.py --trajs_savepath ./trajs --ckpts ./
 - `--questionnaire_savepath`: Optional questionnaire save path, default is `./questionnaire`.
 - `--ip`: Default is LOCALHOST, we **recommend you replace it with your public network IP**, because of a known bug of Flask that may cause extreme lag when playing the game. The same applies when debugging, you should visit your machine's IP in your browser instead of LOCALHOST.
 
-## 4. Customize your experiment settings
+## 4. How to customize
 
 ### Customize experiment statements
 You can replace `configs/statement.md` by your experiment statement markdown file, then restarting your web process.
@@ -94,21 +103,24 @@ You can replace `configs/statement.md` by your experiment statement markdown fil
 ### Customize before game questionnaire.
 You can modify `configs/before_game.yaml` to customize your settings of before game questionnaire.
 
-## 5. Collecting data
+## 5. How to collect data
 Questionnaire data are saved in `./questionnaire`, its corresponging co-play trajectorys is saved in `./trajs`.
 
 We also privide a simple data processing scripts named `questionnaire_analyze.ipynb.`
 
-<!-- COLE with bc on random1
+# License
+[MIT License](LICENSE.md)
 
-```shell
-python overcookedgym/overcooked-flask/app.py --layout_name simple --ego models/COLE/simple/seed_1234/best --alt bc
-``` -->
-
-
-<!-- # Citation
+# Citation
 Please cite
  ```
+@article{li2023cooperative,
+  title={Cooperative Open-ended Learning Framework for Zero-shot Coordination},
+  author={Li, Yang and Zhang, Shao and Sun, Jichen and Du, Yali and Wen, Ying and Wang, Xinbing and Pan, Wei},
+  journal={arXiv preprint arXiv:2302.04831},
+  year={2023}
+}
+
 @article{lou2023pecan,
   title={PECAN: Leveraging Policy Ensemble for Context-Aware Zero-Shot Human-AI Coordination},
   author={Lou, Xingzhou and Guo, Jiaxian and Zhang, Junge and Wang, Jun and Huang, Kaiqi and Du, Yali},
@@ -137,4 +149,4 @@ Please cite
   volume={32},
   year={2019}
 }
- ``` -->
+ ```
