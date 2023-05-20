@@ -1,0 +1,3 @@
+[{'agents': ['human', 'bc'], 'layout': 'simple'}, {'agents': ['human', 'COLE'], 'layout': 'simple'}, {'agents': ['human', 'MEP'], 'layout': 'simple'}, {'agents': ['human', 'COLE'], 'layout': 'unident_s'}, {'agents': [
+'human', 'MEP'], 'layout': 'unident_s'}, {'agents': ['human', 'COLE'], 'layout': 'random1'}, {'agents': ['human', 'MEP'], 'layout': 'random1'}, {'agents': ['human', 'COLE'], 'layout': 'random0'}, {'agents': ['human', 
+'MEP'], 'layout': 'random0'}, {'agents': ['human', 'COLE'], 'layout': 'random3'}, {'agents': ['human', 'MEP'], 'layout': 'random3'}]

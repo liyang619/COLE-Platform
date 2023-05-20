@@ -1,0 +1,26 @@
+trajs/*
+res/
+sub_data/
+traj_ring/
+questionnaire/*
+questionnaire_data/
+trajs_data_backup/
+trajs_ring/
+trajs_data/
+backup/
+logs/
+models/*
+*.ipynb
+*.zip
+
+*.pyc
+__pycache__
+node_modules/
+not_used/
+overcookedgym/overcooked-flask/node_module
+yarn.lock
+*.npy
+data.zip
+models.zip
+# large files
+corridor_am.pkl

@@ -1,0 +1,4 @@
+flask
+tensorboard
+scipy
+tqdm
