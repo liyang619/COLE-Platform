@@ -54,10 +54,45 @@ Install human_aware_rl and its dependencies: overcooked_ai, baselines & stable_b
     pip install -e .
 ```
 
+### Update at June 6th, 2023
+Now we have synced all the changes to the unbuilt files, and added instructions on how to build them using npm. So we removed the big built files to reduce the repository size.
+
+Here are instructions for building.
+
+You need to firstly install npm (if you can't do this, you can checkout our history version to get all built files)
+
+In `overcookedgym/human_aware_rl/overcooked_ai/overcooked_ai_js`, run
+```shell
+npm install
+sudo npm install browserify
+```
+Then
+```shell
+npm run build
+npm run build-window
+```
+to build overcooked_ai game core.
+
+Then, in `overcookedgym/overcooked-flask`
+```shell
+sed -i 's/overcook\"/overcooked\"/g' ../human_aware_rl/overcooked_ai/overcooked_ai_js/package.json
+wget https://raw.githubusercontent.com/HumanCompatibleAI/overcooked_ai/37d14dd48ae93ad0363610a0a370221c47a79eb2/overcooked_ai_js/js/mdp.es6 -O ../human_aware_rl/overcooked_ai/overcooked_ai_js/js/mdp.es6
+wget https://raw.githubusercontent.com/HumanCompatibleAI/overcooked_ai/37d14dd48ae93ad0363610a0a370221c47a79eb2/overcooked_ai_js/js/task.es6 -O ../human_aware_rl/overcooked_ai/overcooked_ai_js/js/task.es6
+    
+npm install
+npm link ../human_aware_rl/overcooked_ai/overcooked_ai_js/
+
+npm run build
+```
+
+
+
 
 ## 2. How to load models
 
 You need to put your model file in `./models`. You can get our trained models [here](https://drive.google.com/drive/folders/1s88a_muyG6pVlfcKDKop6R1Fhxr8dcGH?usp=share_link), including BC, self-play, population-based training, [FCP](https://arxiv.org/abs/2110.08176), [MEP](https://arxiv.org/abs/2112.11701), [COLE](https://arxiv.org/abs/2302.04831).
+
+Also, you need to put this BC [data](https://drive.google.com/drive/folders/1gawHatRHkYor_J520uWgoQucqxwVPZwc?usp=drive_link) in `./data`.
 
 In addition, you can load your own models if they are trained using the [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) framework. 
 Agents are loaded using the `get_agent_from_saved_model()` method, which loads tensorflow predictor models (`.pb` files), so you should save your agents in this style if you wish to load them into our framework. You can reference to the `save` method in `human_aware_rl/pbt/pbt.py` for saving agents that can be loaded.

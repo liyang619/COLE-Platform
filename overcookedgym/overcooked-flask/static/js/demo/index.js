@@ -69,28 +69,59 @@ let layouts = {
     ]
 };
 
-let agent_settings = {
-    "0" : ["human", "ai"],
-    "1" : ["human", "ai"],
-    "2" : ["ai", "ai"]
-}
+let agent_settings = getAgentSettings()
+var agent_type = 0
+var playerIndexList = []
 // should be in line with app.py
 
 let game;
 let agentTypeSelector;
 
-document.addEventListener("DOMContentLoaded", function() {
-    // 前端逻辑：每一次load，先调接口随机给一个agent_type，完成一关之后（到时间后），跳转到问卷页面，填写问卷后继续游戏，最后完成所有游戏之后填写整个游戏反馈的页面
-    agentTypeSelector = document.getElementById("agent_type");
-    console.log('1111111')
-    agentTypeSelector.addEventListener('change', event => {
-        changeModel($("#agent_type").val());
-    });
-});
+document.addEventListener("DOMContentLoaded", function () {
+    // agentTypeSelector = document.getElementById("agent_type");
+    // agentTypeSelector.addEventListener('change', event => {
+    //   changeModel((0, _jquery.default)("#agent_type").val());
+    // });
+    var userInfo = sessionStorage.getItem('before_game')
+    if (!userInfo) {
+      // window.location.href = "/html/before_game"
+      window.location.href = "/html/statement"
+    }
+    // playerIndexList = JSON.parse(sessionStorage.getItem('playerIndexList')) || []
+    // agent_type = playerIndexList.length ? getRandomAgent() : 0
+    agent_type = getAgentType()
+    changeModel(agent_type);
+    // show agent_type and layout on the page
+    let layout_saved = agent_settings[agent_type]['layout']
+    if (agent_type === 0) {
+      $("#agent_type").text('Gameplay trial level')
+    } else {
+      $("#agent_type").append(agent_type)
+    }
+    // console.log("qqq", agent_settings[agent_type]['layout'])
+    // 
+    $("#layout").text(layout_saved)
+    // console.log(paid)
+    console.log(layout_saved)
+    let paidsaa = {
+      "simple": "160",
+      "unident_s": "200",
+      "random1":"140",
+      "random0":"60",
+      "random3":"80"
+    }
+    if (agent_type === 0){
+      document.getElementById("bonus").style.display = "none"
+    }
+    let paids = paidsaa[layout_saved]
+
+    // (0, _jquery.default)("#paid").text(paids)
+    let x = document.getElementById("paid")
+    x.innerHTML = paids
+  });
 
 
 function startGame(endOfGameCallback) {
-    console.log('222222')
     let AGENT_INDEX = 1 - PARAMS.PLAYER_INDEX;
     /***********************************
           Set up websockets server
@@ -99,121 +130,161 @@ function startGame(endOfGameCallback) {
     // let gameserverio = new GameServerIO({HOST});
 
     // let players = [$("#playerZero").val(), $("#playerOne").val()];
-    let players = agent_settings[$("#agent_type").val()]
-    console.log(players)
+    // let players = agent_settings[(0, _jquery.default)("#agent_type").val()];
+    let players = agent_settings[agent_type].agents
+    console.log(players);
     let algo = $("#algo").val();
     let deterministic = $("#deterministic").is(':checked');
     let saveTrajectory = $("#saveTrajectories").is(':checked');
     if (players[0] == 'human' && players[1] == 'human') {
-        $("#overcooked").html("<h3>Sorry, we can't support humans as both players.  Please make a different dropdown selection and hit Enter!</h3>"); 
-        endOfGameCallback();
-        return;
+      $("#overcooked").html("<h3>Sorry, we can't support humans as both players.  Please make a different dropdown selection and hit Enter!</h3>");
+      endOfGameCallback();
+      return;
     }
-    let player_index = null; 
-    let npc_policies = [0, 1]; 
+    let player_index = null;
+    let npc_policies = [0, 1];
     if (players[0] == 'human') {
-        player_index = 0;
-        npc_policies = [1];
+      player_index = 0;
+      npc_policies = [1];
     }
     if (players[1] == 'human') {
-        player_index = 1;
-        npc_policies = [0]; 
+      player_index = 1;
+      npc_policies = [0];
     }
-    
-    let layout_name = $("#layout").val();
+    // let layout_name = (0, _jquery.default)("#layout").val();
+    let layout_name = getLayoutName(agent_type, agent_settings)
     let game_time = $("#gameTime").val();
     if (game_time > 1800) {
-        $("#overcooked").html("<h3>Sorry, please choose a shorter amount of time for the game!</h3>"); 
-        endOfGameCallback();
-        return;
+      $("#overcooked").html("<h3>Sorry, please choose a shorter amount of time for the game!</h3>");
+      endOfGameCallback();
+      return;
     }
-
     let layout = layouts[layout_name];
-    console.log(layout)
-    console.log(layout_name)
-
-
+    console.log(layout);
+    console.log(layout_name);
     $("#overcooked").empty();
     let mdp_params = {
-        "layout_name": layout_name, 
-        "num_items_for_soup": 3, 
-        "rew_shaping_params": null, 
-    }
+      "layout_name": layout_name,
+      "num_items_for_soup": 3,
+      "rew_shaping_params": null
+    };
     game = new OvercookedSinglePlayerTask({
-        container_id: "overcooked",
-        player_index: player_index,
-        start_grid: layout,
-        layout_name: layout_name,
-        npc_policies: npc_policies,
-        algo: algo,
-        mdp_params: mdp_params,
-        task_params: PARAMS,
-        save_trajectory: saveTrajectory,
-        TIMESTEP : PARAMS.TIMESTEP_LENGTH,
-        MAX_TIME : game_time, //seconds
-        init_orders: null,
-        completion_callback: () => {
-            console.log("Time up");
-            // give a questionaire
-            endOfGameCallback();
-        },
-        DELIVERY_REWARD: PARAMS.DELIVERY_POINTS
+      container_id: "overcooked",
+      player_index: player_index,
+      start_grid: layout,
+      layout_name: layout_name,
+      npc_policies: npc_policies,
+      algo: algo,
+      mdp_params: mdp_params,
+      task_params: PARAMS,
+      save_trajectory: saveTrajectory,
+      TIMESTEP: PARAMS.TIMESTEP_LENGTH,
+      MAX_TIME: game_time,
+      //seconds
+      init_orders: null,
+      completion_callback: () => {
+        console.log("Time up");
+        endOfGameCallback();
+        // 记录本次Agent
+        // setRandomAgent()
+        setAgentType(agent_type)
+        // 在这里跳转并填写问卷
+        if (agent_type === 0) {
+          window.location.href = "/"
+        } else {
+          window.location.href = "/html/in_game"
+        }
+      },
+      DELIVERY_REWARD: PARAMS.DELIVERY_POINTS
     });
     game.init();
-}
-
-function endGame() {
+  }
+  function endGame() {
     game.close();
-}
+  }
 
-// Handler to be added to $(document) on keydown when a game is not in
-// progress, that will then start the game when Enter is pressed.
-function startGameOnEnter(e) {
+  // Handler to be added to $(document) on keydown when a game is not in
+  // progress, that will then start the game when Enter is pressed.
+  function startGameOnEnter(e) {
     // Do nothing for keys other than Enter
     if (e.which !== 13) {
-	return;
+      return;
     }
-
     disableEnter();
     // Reenable enter handler when the game ends
     startGame(enableEnter);
-}
-
-function enableEnter() {
+  }
+  function enableEnter() {
     $(document).keydown(startGameOnEnter);
     $("#control").html("<p>Press enter to begin!</p><p>(make sure you've deselected all input elements first!)</p>");
-}
-
-function disableEnter() {
+  }
+  function disableEnter() {
     $(document).off("keydown");
     $("#control").html('');
-    // $("#control").html('<button id="reset" type="button" class="btn btn-primary">Reset</button>');
-    // $("#reset").click(endGame);
-}
-
-
-function changeModel(agent_type) {
+    // (0, _jquery.default)("#control").html('<button id="reset" type="button" class="btn btn-primary">Reset</button>');
+    // (0, _jquery.default)("#reset").click(endGame);
+  }
+  function changeModel(agent_type) {
     console.log("Changed Model to: " + agent_type);
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "/changemodel", false); // false for synchronous
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
-        agent_type : agent_type
+      agent_type: agent_type
     }));
     var response = JSON.parse(xhr.response);
-    console.log("response:")
+    console.log("response:");
     console.log(response);
-}
+  }
+  function getRandomAgent() {
+    var agent = Math.floor(Math.random() * 25) + 1
+    if (playerIndexList.includes(agent)) {
+      agent = getRandomAgent()
+    }
+    console.log('agent', agent, playerIndexList)
 
-function getRandomAgent() {
+    // [1, 25]
+    return agent
+  }
 
-}
-function isAgentPlayedTest(agent) {
+  function setRandomAgent() {
+    if (playerIndexList.length >= 26) {
+      return
+    }
+    var list = playerIndexList.concat(agent_type)
+    console.log('list', list)
+    sessionStorage.setItem('playerIndexList', JSON.stringify(list));
+  }
 
-}
-function saveDataToSession() {
-    
-}
+  function getAgentType() {
+    let agent_type = sessionStorage.getItem('agent_type')
+    let level = agent_type ? Number(agent_type) + 1 : 0
+    return level
+  }
+
+  function setAgentType(agent_type) {
+    if (agent_type > agent_settings.length - 1) {
+      return
+    }
+    sessionStorage.setItem('agent_type', agent_type);
+  }
+
+  function getAgentSettings() {
+    let agent_settings = JSON.parse(sessionStorage.getItem('game_setting_list')) || []
+    return agent_settings
+  }
+
+  function getLayoutName(agent_type, agent_settings) {
+    let layoutMap = {
+      "simple": "cramped_room",
+      "unident_s": "asymmetric_advantages",
+      "random1": "coordination_ring",
+      "random0": "forced_coordination",
+      "random3": "counter_circuit",
+    }
+    let layout = agent_settings[agent_type].layout
+    return layoutMap[layout]
+  }
 
 $(document).ready(() => {
     enableEnter();

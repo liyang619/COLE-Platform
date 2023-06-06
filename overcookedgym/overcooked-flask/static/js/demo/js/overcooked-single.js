@@ -53,7 +53,7 @@ export default class OvercookedSinglePlayerTask {
         this.player_index = player_index;
         this.algo = algo;
 
-        let player_colors = { 0: 'blue', 1: 'green' };
+        let player_colors = this.getHatColor();
 
         this.game = new OvercookedGame({
             start_grid,
@@ -100,41 +100,59 @@ export default class OvercookedSinglePlayerTask {
     init() {
         this.game.init();
 
-        this.start_time = new Date().getTime();
+        this.start_time = -1;
+
         this.state = this.game.mdp.get_start_state(this.init_orders);
         this.game.drawState(this.state);
         this.joint_action = [STAY, STAY];
         // this.lstm_state = [null, null];
         this.done = 1;
-
+        var agent_settings = this.getAgentSettings()
+        var agent_type = this.getAgentType()
+        console.log('agent_settings', agent_settings[agent_type])
+        var player_agents = agent_settings[agent_type]['agents']
+        var ai = player_agents[0] === 'human' ? player_agents[1] : player_agents[0]
+        var layout = agent_settings[agent_type].layout
         this.gameloop = setInterval(() => {
             for (const npc_index of this.npc_policies) {
                 // let [npc_a, lstm_state] = this.npc_policies[npc_index](this.state, this.done, this.lstm_state[npc_index], this.game);
-                
+
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", "/predict", false); // false for synchronous
+                // http://10.10.9.30:8089/random0/MEP/predict/
+                // http://10.10.9.30:8088/simple/COLE/predict/
+                // let predicStr = '/predict/'
+                let url = agent_settings[agent_type].url
+                // let new_npc_index = !url ?  npc_index : str.slice(url.length - predicStr.length + 1, url.length - predicStr.length)
+                // let apiUrl = url || "/predict"
+                xhr.open("POST", url, false);
+                // xhr.open("POST", "/" + layout + "/" + ai +"/predict/", false); // false for synchronous
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify({
-                    state: this.state,
-                    npc_index: npc_index,
-                    layout_name: this.layout_name,
-                    algo: this.algo,
-                    timestep: this.cur_gameloop,
+                state: this.state,
+                // npc_index: npc_index,
+                npc_index: player_agents[0] === 'human' ? 1 : 0,
+                layout_name: this.layout_name,
+                algo: this.algo,
+                timestep: this.cur_gameloop
                 }));
                 var action_idx = JSON.parse(xhr.responseText)["action"];
                 let npc_a = Action.INDEX_TO_ACTION[action_idx];
-                console.log(npc_a);
+                // console.log(npc_a);
 
                 // this.lstm_state[npc_index] = lstm_state;
                 this.joint_action[npc_index] = npc_a;
-            }
 
+                if (this.start_time == -1) { // see above
+                this.start_time = new Date().getTime();
+                }
+
+            }
             this.joint_action_idx = [Action.ACTION_TO_INDEX[this.joint_action[0]], Action.ACTION_TO_INDEX[this.joint_action[1]]];
-            let [[next_state, prob], reward] =
-                this.game.mdp.get_transition_states_and_probs({
-                    state: this.state,
-                    joint_action: this.joint_action
-                });
+            let [[next_state, prob], reward] = this.game.mdp.get_transition_states_and_probs({
+                state: this.state,
+                joint_action: this.joint_action
+            });
+
 
             // Apparently doing a Parse(Stringify(Obj)) is actually the most succinct way. 
             // to do a deep copy in JS 
@@ -212,20 +230,21 @@ export default class OvercookedSinglePlayerTask {
         })
 
         document.getElementById('control').innerHTML = "Updating model...please wait...";
-        setTimeout(() => {  
-            // make dom finishes rendering
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/updatemodel", false); // false for synchronous
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify({
+        setTimeout(() => {
+          // make dom finishes rendering
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/updatemodel", false); // false for synchronous
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify({
             traj_id: traj_time + "_human=" + this.player_index,
             traj: parsed_trajectory_data,
             layout_name: this.layout_name,
-            algo: this.algo,
-        }));
-        var status = JSON.parse(xhr.responseText);
-        console.log("status: " + status);
+            algo: this.algo
+          }));
+          // 前端存session
+          this.setQuesData(traj_time + "_human=" + this.player_index)
+          var status = JSON.parse(xhr.responseText);
+          console.log("status: " + status);
 
         // let fileName = traj_time + "_" + task_params.MODEL_TYPE + "_" + task_params.PLAYER_INDEX + ".json";
 
@@ -290,4 +309,70 @@ export default class OvercookedSinglePlayerTask {
     disable_response_listener() {
         $(document).off('keydown');
     }
+
+    getAgentType() {
+        let agent_type = sessionStorage.getItem('agent_type')
+        let level = agent_type ? Number(agent_type) + 1 : 0
+        return level
+      }
+      getAgentSettings() {
+        let agent_settings = JSON.parse(sessionStorage.getItem('game_setting_list')) || []
+        return agent_settings
+      }
+      setQuesData(traj_id) {
+        var inGameList = JSON.parse(sessionStorage.getItem('in_game')) || []
+        // var agent_type = $("#agent_type").text()
+        var agent_type = this.getAgentType()
+        // if (agent_type === 'Gameplay trial level') {
+        //   agent_type = 0
+        // }
+        inGameList.push({
+          traj_id,
+          agent_type,
+          questionnaire: {}
+        })
+        sessionStorage.setItem('in_game', JSON.stringify(inGameList))
+      }
+      getHatColor() {
+        // console.log('this', this, agent_settings)
+        let game_setting_list = sessionStorage.getItem('game_setting_list')
+
+        var agent_settings = this.getAgentSettings()
+        // var agent_type = $("#agent_type").text()
+        var agent_type = this.getAgentType()
+        // if (agent_type === 'Gameplay trial level') {
+        //   agent_type = 0
+        // }
+        console.log(agent_settings)
+        let players = agent_settings[agent_type]['agents'];
+        let ai_type;
+        let human_idx, ai_idx;
+        if (players[0] == 'human') {
+          human_idx = 0;
+          ai_idx = 1;
+          ai_type = players[1];
+        }
+        else if (players[1] == 'human') {
+          human_idx = 1;
+          ai_idx = 0;
+          ai_type = players[0];
+        }
+        else {
+          throw ("Unexpected agent type: " + players.toString());
+        }
+        // let ai_players = game_setting_list[]
+        let colors = { 0: 'white', 1: 'red' };
+        let human_color = 'gray';
+        let colorMap = {
+          'SP': 'blue',
+          'PBT': 'green',
+          'FCP': 'red',
+          'MEP': 'purple',
+          'COLE': 'orange'
+        }
+        var agent_colors = {};
+        agent_colors[human_idx] = human_color;
+        agent_colors[ai_idx] = colorMap[ai_type] || 'blue';
+        return agent_colors
+      }
 }
