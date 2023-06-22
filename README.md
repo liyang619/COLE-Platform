@@ -94,6 +94,18 @@ You need to put your model file in `./models`. You can get our trained models [h
 
 Also, you need to put this BC [data](https://drive.google.com/drive/folders/1gawHatRHkYor_J520uWgoQucqxwVPZwc?usp=drive_link) in `./data`.
 
+**Note:** The layout names in code and google drive are not aligned with the layout names in those papers. Here is the mapping:
+
+```code
+PYTHON_LAYOUT_NAME_TO_ENV_NAME = {
+    "unident_s": "Asymmetric Advantages",
+    "simple": "Cramped Room",
+    "random1": "Coordination Ring",
+    "random0": "Forced Coordination",
+    "random3": "Counter Circuit"
+}
+```
+
 In addition, you can load your own models if they are trained using the [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) framework. 
 Agents are loaded using the `get_agent_from_saved_model()` method, which loads tensorflow predictor models (`.pb` files), so you should save your agents in this style if you wish to load them into our framework. You can reference to the `save` method in `human_aware_rl/pbt/pbt.py` for saving agents that can be loaded.
 
