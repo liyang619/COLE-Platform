@@ -101,7 +101,7 @@ export default class OvercookedTrajectoryReplay{
             this.joint_action = lookupActions(actions_arr);
             // read the two player actions out of the trajectory 
             // Do a transition and get the next state and reward.
-            let [[next_state, prob], reward] = this.game.mdp.get_transition_states_and_probs({
+            let [[next_state, prob], reward] = this.game.mdp.get_transition_states_and_probs_for_replay({
             state: this.state,
             joint_action: this.joint_action
             });
