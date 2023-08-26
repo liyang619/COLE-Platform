@@ -142,3 +142,5 @@ def run_all_bc_experiments():
 
 #     save_pickle(best_bc_model_paths, BEST_BC_MODELS_PATH)
 #     return best_bc_model_paths
+
+run_all_bc_experiments()

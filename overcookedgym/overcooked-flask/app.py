@@ -169,6 +169,8 @@ def predict(algo):
         npc_index = int(player_id_dict)
         layout_name = NAME_TRANSLATION[server_layout_name]
 
+        # print(state_dict)
+
         s0, s1 = process_state(state_dict, layout_name)
         print(state_dict)
         if npc_index == 1:

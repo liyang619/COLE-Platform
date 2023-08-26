@@ -621,6 +621,7 @@ class OvercookedGridworld(object):
         pots_states_dict['onion'] = defaultdict(list)
         pots_states_dict['tomato'] = defaultdict(list)
         for pot_pos in self.get_pot_locations():
+            # print(pot_pos)
             if not state.has_object(pot_pos):
                 pots_states_dict['empty'].append(pot_pos)
             else:
@@ -1106,6 +1107,7 @@ class OvercookedGridworld(object):
         IDX_TO_OBJ = ["onion", "soup", "dish"]
         OBJ_TO_IDX = { o_name:idx for idx, o_name in enumerate(IDX_TO_OBJ) }
 
+        # print(overcooked_state)
         counter_objects = self.get_counter_objects_dict(overcooked_state)
         pot_state = self.get_pot_states(overcooked_state)
 

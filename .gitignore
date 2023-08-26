@@ -9,6 +9,8 @@ trajs_ring/
 trajs_data/
 backup/
 logs/
+data/
+clean_train_trials.pkl
 models/*
 *.ipynb
 *.zip
