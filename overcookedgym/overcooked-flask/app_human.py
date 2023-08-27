@@ -529,16 +529,11 @@ def set_agent(algo, agent_idx: int, layout_name: str):
 
 
 if __name__ == "__main__":
-    best_bc_model_paths = load_pickle("models/bc_runs/best_bc_model_paths")
 
-    print("loading agent models....")
-    t0 = time.time()
     game_settings = init_game_settings_random(ALGO, ALGO_BASELINES, "human", ALL_LAYOUTS, "bc")
     print(game_settings)
-    AGENTS = load_all_agents(ARGS.ckpts, best_bc_model_paths, True)
     # set_agent_pair(AGENT_SETTINGS[ARGS.default][0], AGENT_SETTINGS[ARGS.default][1], LAYOUT_SETTINGS[str(ARGS.default)])
     print("----------- load agents success! -----------")
-    print(f"Took {time.time() - t0} secs")
     print(AGENTS)
     print("---------------------------")
 
