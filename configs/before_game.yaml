@@ -1,8 +1,0 @@
-name: False
-email: False
-phone: False
-age: True
-gender: True
-gameskill: False
-is_played: True
-level: True
