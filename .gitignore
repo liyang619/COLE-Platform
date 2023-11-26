@@ -24,3 +24,6 @@ data.zip
 models.zip
 # large files
 corridor_am.pkl
+
+.DS_Store
+.vscode
