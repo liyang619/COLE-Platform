@@ -1,8 +1,29 @@
-# README
+# COLE: Cooperative Open-ended Learning Framework for Zero-shot Human-AI Coordination
 
-Welcome to the official GitHub repository for the research paper "Tackling Cooperative Incompatibility for Zero-Shot Human-AI Coordination". This paper, submitted to the Special Track on Hybrid Human-Artificial Intelligence in the Journal of Artificial Intelligence Research (JAIR), is an extension of the paper [Cooperative Open-ended Learning Framework for Zero-shot Coordination](https://arxiv.org/abs/2302.04831), which was accepted by ICML 2023.
-
+Welcome to the COLE repository! The official GitHub repository is for our series work "Cooperative Open-ended Learning Framework for Zero-shot Coordination" (accepted by ICML2023) and "Tackling Cooperative Incompatibility for Zero-Shot Human-AI Coordination". 
 You can access our hands-on [demo page](https://sites.google.com/view/cole-jair).
+Below, you'll find a list of distinct features that our repository offers.
+
+<span style="color:red;">Update: New Features are Available:</span> 
+- 1. Support Human-Human Experiments 
+- 2. Play with LLM Agent like GPT-4 (main branch) 
+- 3. Training your own COLE_SV agent (cole_training branch) 
+- 4. ZSC baseline agents including SP, FCP, PBT, MEP (baseline_training branch).
+
+
+## Features
+
+This repository presents a human-AI evaluation platform centered on the popular game Overcooked 2, created specifically to facilitate experiments involving human-AI interaction. Overcooked is an engaging, fully cooperative game that requires two players to work in concert. The architecture of the system is outlined below.
+
+Here, you're granted the ability to:
+- Upload your weights (main branch)
+- Customize the human questionnaire (main branch)
+- Configure game settings (main branch)
+- Human-Human Play (human branch)
+- Play with LLM agent like gpt-4 (main branch)
+- Training your own COLE_SV agent (cole_training branch) and ZSC baseline agents including SP, FCP, PBT, MEP (baseline_training branch)
+- And many more!
+
 
 This repository introduces a human-AI evaluation platform built around the Overcooked game, designed to support Human-AI experiments. Overcooked, a two-player fully cooperative game. The system is shown as follows.
 
@@ -12,16 +33,17 @@ This repository introduces a human-AI evaluation platform built around the Overc
 </p>
 Here, you're granted the ability to:
 
-- Upload your weights
-- Customize the human questionnaire
-- Configure game settings
+- Upload your weights (main branch)
+- Customize the human questionnaire (main branch)
+- Configure game settings (main branch)
+- Play with LLM agent like gpt-4 (main branch)
+- Training your own COLE_SV agent (cole branch) and ZSC baseline agents including SP, FCP, PBT, MEP (baseline branch)
 - And many more!
 
-Our codebase is a modified version of the [PECAN](https://github.com/LxzGordon/PECAN) repository, adapted to better suit our specific research needs. Besides, we integrate [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) agent models with the [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) framework for convenient human-ai coordination study on Overcooked. Changes are done under the [overcookedgym/overcooked-flask](https://github.com/LxzGordon/pecan_human_AI_coordination/tree/master/overcookedgym/overcooked-flask) directory.
 
-# Getting Started
+## Getting Started
 
-## 1. How to setup
+### 1. How to setup
 Install [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) in this repo
  ```shell
     conda create -n overcooked-vis python=3.7
@@ -54,10 +76,7 @@ Install human_aware_rl and its dependencies: overcooked_ai, baselines & stable_b
     pip install -e .
 ```
 
-### Update at June 6th, 2023
-Now we have synced all the changes to the unbuilt files, and added instructions on how to build them using npm. So we removed the big built files to reduce the repository size.
-
-Here are instructions for building.
+Here are instructions for building using npm.
 
 You need to firstly install npm (if you can't do this, you can checkout our history version to get all built files)
 
@@ -85,10 +104,7 @@ npm link ../human_aware_rl/overcooked_ai/overcooked_ai_js/
 npm run build
 ```
 
-
-
-
-## 2. How to load models
+### 2. How to load models
 
 You need to put your model file in `./models`. You can get our trained models [here](https://drive.google.com/drive/folders/1s88a_muyG6pVlfcKDKop6R1Fhxr8dcGH?usp=share_link), including BC, self-play, population-based training, [FCP](https://arxiv.org/abs/2110.08176), [MEP](https://arxiv.org/abs/2112.11701), [COLE](https://arxiv.org/abs/2302.04831).
 
@@ -130,7 +146,7 @@ To load your own models, you need to put them in the `./models` folder in a name
   ...
 ``` 
 
-## 3. How to run
+### 3. How to run
 
 ```shell
 python overcookedgym/overcooked-flask/app.py --trajs_savepath ./trajs --ckpts ./models
@@ -142,15 +158,15 @@ python overcookedgym/overcooked-flask/app.py --trajs_savepath ./trajs --ckpts ./
 - `--questionnaire_savepath`: Optional questionnaire save path, default is `./questionnaire`.
 - `--ip`: Default is LOCALHOST, we **recommend you replace it with your public network IP**, because of a known bug of Flask that may cause extreme lag when playing the game. The same applies when debugging, you should visit your machine's IP in your browser instead of LOCALHOST.
 
-## 4. How to customize
+### 4. How to customize
 
-### Customize experiment statements
+#### Customize experiment statements
 You can replace `configs/statement.md` by your experiment statement markdown file, then restarting your web process.
 
-### Customize before game questionnaire.
+#### Customize before game questionnaire.
 You can modify `configs/before_game.yaml` to customize your settings of before game questionnaire.
 
-## 5. How to collect data
+### 5. How to collect data
 Questionnaire data are saved in `./questionnaire`, its corresponging co-play trajectorys is saved in `./trajs`.
 
 We also privide a simple data processing scripts named `questionnaire_analyze.ipynb.`
@@ -161,21 +177,28 @@ We also privide a simple data processing scripts named `questionnaire_analyze.ip
 # Citation
 Please cite
  ```
-@article{li2023cooperative,
-  title={Cooperative Open-ended Learning Framework for Zero-shot Coordination},
-  author={Li, Yang and Zhang, Shao and Sun, Jichen and Du, Yali and Wen, Ying and Wang, Xinbing and Pan, Wei},
-  journal={arXiv preprint arXiv:2302.04831},
-  year={2023}
+@inproceedings{10.5555/3618408.3619252,
+author = {Li, Yang and Zhang, Shao and Sun, Jichen and Du, Yali and Wen, Ying and Wang, Xinbing and Pan, Wei},
+title = {Cooperative Open-Ended Learning Framework for Zero-Shot Coordination},
+year = {2023},
+publisher = {JMLR.org},
+booktitle = {Proceedings of the 40th International Conference on Machine Learning},
+articleno = {844},
+numpages = {15},
+location = {Honolulu, Hawaii, USA},
+series = {ICML'23}
 }
-
-@article{lou2023pecan,
-  title={PECAN: Leveraging Policy Ensemble for Context-Aware Zero-Shot Human-AI Coordination},
-  author={Lou, Xingzhou and Guo, Jiaxian and Zhang, Junge and Wang, Jun and Huang, Kaiqi and Du, Yali},
-  journal={arXiv preprint arXiv:2301.06387},
-  year={2023}
+```
+```
+@misc{li2023tackling,
+      title={Tackling Cooperative Incompatibility for Zero-Shot Human-AI Coordination}, 
+      author={Yang Li and Shao Zhang and Jichen Sun and Wenhao Zhang and Yali Du and Ying Wen and Xinbing Wang and Wei Pan},
+      year={2023},
+      eprint={2306.03034},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI}
 }
  ```
-
  ```
  @inproceedings{sarkar2022pantheonrl,
   title={PantheonRL: A MARL Library for Dynamic Training Interactions},
