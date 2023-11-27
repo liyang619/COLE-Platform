@@ -25,3 +25,45 @@ Here, you're granted the ability to:
 - And many more!
 
 ## Getting Started to Train Baselines of ZSC on OVERCOOKED2 
+
+### How to install requirements?
+Run
+```
+conda create -n cole python==3.7
+conda activate cole
+pip install -r requirements.txt
+sh ./install.sh
+```
+
+If you find there are errors about sacred, you can modify the get_commit_if_possible function in dependencies.py of sacred as
+```
+def get_commit_if_possible(filename):
+    return None, None, None
+```
+
+### How to run the training code?
+In human_aware_rl, run
+`SP`:
+```
+bash experiments/ppo_sp_experiments.sh
+```
+
+`PBT`:
+```
+bash experiments/pbt_experiments.sh
+```
+
+`FCP`:
+```
+bash experiments/train_population.sh
+bash exoerunebts/fcp_train.sh
+```
+
+`MEP`:
+```
+bash experiments/mep_train.sh
+bash experiments/mep_train_s2.sh
+```
+
+
+
