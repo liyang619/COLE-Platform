@@ -2,6 +2,7 @@ import $ from "jquery"
 import _ from "lodash"
 
 import OvercookedSinglePlayerTask from "./js/overcooked-single";
+import OvercookedMultiPlayerTask from "./js/overcooked-multi";
 import getOvercookedPolicy from "./js/load_tf_model.js";
 
 import * as Overcooked from "overcooked"
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // playerIndexList = JSON.parse(sessionStorage.getItem('playerIndexList')) || []
     // agent_type = playerIndexList.length ? getRandomAgent() : 0
     agent_type = getAgentType()
-    changeModel(agent_type);
+    // changeModel(agent_type);
     // show agent_type and layout on the page
     let layout_saved = agent_settings[agent_type]['layout']
     if (agent_type === 0) {
@@ -136,21 +137,22 @@ function startGame(endOfGameCallback) {
     let algo = $("#algo").val();
     let deterministic = $("#deterministic").is(':checked');
     let saveTrajectory = $("#saveTrajectories").is(':checked');
-    if (players[0] == 'human' && players[1] == 'human') {
-      $("#overcooked").html("<h3>Sorry, we can't support humans as both players.  Please make a different dropdown selection and hit Enter!</h3>");
-      endOfGameCallback();
-      return;
-    }
+    // if (players[0] == 'human' && players[1] == 'human') {
+    //   $("#overcooked").html("<h3>Sorry, we can't support humans as both players.  Please make a different dropdown selection and hit Enter!</h3>");
+    //   endOfGameCallback();
+    //   return;
+    // }
     let player_index = null;
     let npc_policies = [0, 1];
-    if (players[0] == 'human') {
+    if (players % 2 == 0) {
       player_index = 0;
       npc_policies = [1];
     }
-    if (players[1] == 'human') {
+    if (players % 2 == 1) {
       player_index = 1;
       npc_policies = [0];
     }
+    console.log(player_index)
     // let layout_name = (0, _jquery.default)("#layout").val();
     let layout_name = getLayoutName(agent_type, agent_settings)
     let game_time = $("#gameTime").val();
@@ -168,7 +170,7 @@ function startGame(endOfGameCallback) {
       "num_items_for_soup": 3,
       "rew_shaping_params": null
     };
-    game = new OvercookedSinglePlayerTask({
+    game = new OvercookedMultiPlayerTask({
       container_id: "overcooked",
       player_index: player_index,
       start_grid: layout,

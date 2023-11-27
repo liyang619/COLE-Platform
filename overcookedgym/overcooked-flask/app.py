@@ -48,7 +48,8 @@ ALGO_BASELINES = ["SP", "PBT", "MEP", "FCP"]
 cur_algo_idx = -1
 # HUMAN_LIST = ["human"]
 
-ALL_LAYOUTS = ['simple', 'unident_s', 'random1', 'random0', 'random3']
+ALL_LAYOUTS = ['simple', 'unident_s']
+# ALL_LAYOUTS = ['simple', 'unident_s', 'random1', 'random0', 'random3']
 
 AGENTS = {
     layout: dict() for layout in ALL_LAYOUTS

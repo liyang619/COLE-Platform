@@ -19,6 +19,8 @@ from pantheonrl.common.trajsaver import SimultaneousTransitions
 from pantheonrl.tf_utils import get_agent_from_saved_model
 from flask_cors import CORS
 
+import openai
+
 # Overcooked action translation,
 # the numbers are used internally to represent different actions
 ACTION_ID_TRANSLATION = {0: "up", 1: "down", 2: "right", 3: "left", 4: "stay", 5: "interact"}
@@ -36,8 +38,28 @@ BC_ACTION_TRANSLATION = {
     (1, 0): 2,  # right
 }
 
+
+ACTION_TRANSLATION = {
+    "[0, -1]": 0,
+    "[0, 1]": 1,
+    "[1, 0]": 2,
+    "[-1, 0]":3,
+    "[0, 0]": 4,
+    "INTERACT": 5
+}
+
 POLICY_P0, POLICY_P1 = None, None
 ALGO_P0, ALGO_P1 = None, None
+
+MAX_AGENTS = 2
+
+
+# AGENTS_TIMESTEP = [-1] * (2 * MAX_AGENTS)
+AGENTS_TIMESTEP = np.ones(2*MAX_AGENTS) * (-1)
+
+# AGENTS_ACTION = [[4] * 500] * (2 * MAX_AGENTS)
+AGENTS_ACTION = np.ones((2*MAX_AGENTS, 500)) * 4
+
 
 # Different game settings. Each pair means both player types, (player0, player1).
 # "human" means the player is HUMAN KEYBOARD INPUT.
@@ -45,7 +67,7 @@ ALGO_P0, ALGO_P1 = None, None
 # AGENT_SETTINGS = {"0": ("human", "COLE"), "1": ("human", "COLE_NOSP"), "2": ("COLE", "COLE_NOSP")}
 ALGO = "COLE"
 ALGO_BASELINES = ["SP", "PBT", "MEP", "FCP"]
-cur_algo_idx = -1
+cur_algo_idx = -2
 # HUMAN_LIST = ["human"]
 
 ALL_LAYOUTS = ['simple', 'unident_s', 'random1', 'random0', 'random3']
@@ -72,7 +94,7 @@ parser.add_argument(
 )
 
 parser.add_argument("--sim_threads", type=int, default=30, help="simulation threads for trained agent")
-parser.add_argument("--ip", type=str, default='localhost', help="your public network ip, default is localhost")
+parser.add_argument("--ip", type=str, default='192.168.1.114', help="your public network ip, default is localhost")
 global ARGS
 ARGS = parser.parse_args()
 LOCAL_IP = ARGS.ip
@@ -147,13 +169,48 @@ def convert_traj_to_simultaneous_transitions(traj_dict, layout_name):
     )
 
 
-@app.route("/humanplay", methods=["POST"])
-def humanplay():
+@app.route(f"/<idx>/llm", methods=["POST"])
+def llm(idx):
     '''
-    human play
+    llm
     '''
     if request.method == "POST":
         pass
+
+
+
+@app.route(f"/<idx>/humanplay/", methods=["POST"])
+def humanplay(idx):
+    ''' 
+    human play
+    '''
+    if request.method == "POST":
+        data_json = json.loads(request.data)
+        my_action, state_dict, opp_idx, server_layout_name, timestep = (
+            data_json["action"],
+            data_json["state"],
+            data_json["index"],
+            data_json["layout_name"],
+            data_json["timestep"],
+        )
+        timestep = int(timestep)
+        opp_idx = int(opp_idx)
+        # print(opp_idx, AGENTS_ACTION[opp_idx][timestep])
+        AGENTS_TIMESTEP[int(idx)] = timestep
+        # print(ACTION_TRANSLATION[str(my_action)])
+        AGENTS_ACTION[int(idx), timestep] = ACTION_TRANSLATION[str(my_action)]
+        # print(AGENTS_ACTION[int(idx)])
+        # print(action)
+
+        # return jsonify
+        # while AGENTS_TIMESTEP[opp_idx] < 0:
+        #     pass
+
+        while AGENTS_TIMESTEP[opp_idx] < timestep:
+            pass
+        # print(idx, int(idx), my_action, opp_idx, AGENTS_ACTION[opp_idx, timestep], AGENTS_ACTION[int(idx), timestep])
+
+        return jsonify({"action": AGENTS_ACTION[opp_idx, timestep]})
 
 
 
@@ -419,36 +476,37 @@ def init_game_settings_random(algo: str, baselines: list, human_name: str, layou
 
     ### Choose algo in turn for small-scale test
     global cur_algo_idx
-    cur_algo_idx = (cur_algo_idx + 1) % len(baselines)
-    algo_control = baselines[cur_algo_idx]
+    cur_algo_idx = (cur_algo_idx + 1) % (2*MAX_AGENTS)
+    # algo_control = baselines[cur_algo_idx]
+    human_idx = cur_algo_idx
 
     swap_algo_order = random.choice([False, True])  # whether to do ababab or bababa order
-    algo0, algo1 = (algo, algo_control) if not swap_algo_order else (algo_control, algo)
+    # algo0, algo1 = (algo, algo_control) if not swap_algo_order else (algo_control, algo)
 
     game_settings = []
-    if trial_algo is not None:
-        game_settings.append({"agents": [human_name, trial_algo],
-                              "layout": trial_layout,
-                              "layout_alias": NAME_TRANSLATION_REVERSE[trial_layout],
-                              "url": f"http://{LOCAL_IP}:{ARGS.port}/bc/predict/"
-                              })
+    # if trial_algo is not None:
+    #     game_settings.append({"agents": [human_name, trial_algo],
+    #                           "layout": trial_layout,
+    #                           "layout_alias": NAME_TRANSLATION_REVERSE[trial_layout],
+    #                           "url": f"http://{LOCAL_IP}:{ARGS.port}/bc/predict/"
+    #                           })
     for layout in layouts:
-        do_swap_index = random.choice([0, 1]) if random_start_index else 1
-        human_algo0_pair = [human_name, algo0] if do_swap_index else [algo0, human_name]
-        human_algo1_pair = [human_name, algo1] if do_swap_index else [algo1, human_name]
-        game_settings.extend([{"agents": human_algo0_pair,
+        # do_swap_index = random.choice([0, 1]) if random_start_index else 1s
+        # human_algo0_pair = [human_name, algo0] if do_swap_index else [algo0, human_name]
+        # human_algo1_pair = [human_name, algo1] if do_swap_index else [algo1, human_name]
+        game_settings.extend([{"agents": human_idx,
                                "layout": layout,
                                "layout_alias": NAME_TRANSLATION_REVERSE[layout],
-                               "url": f"http://{LOCAL_IP}:{ARGS.port}/{algo0}/predict/"
+                               "url": f"http://{LOCAL_IP}:{ARGS.port}/{human_idx}/humanplay/"
                                }, {
-                                  "agents": human_algo1_pair,
+                                  "agents": human_idx,
                                   "layout": layout,
                                   "layout_alias": NAME_TRANSLATION_REVERSE[layout],
-                                  "url": f"http://{LOCAL_IP}:{ARGS.port}/{algo1}/predict/"
+                                  "url": f"http://{LOCAL_IP}:{ARGS.port}/{human_idx}/humanplay/"
                               }])
 
-    print(game_settings)
-    print("Algos Chosen are: ", algo0, algo1)
+    print(human_idx, "\n\n\n\n")
+    # print("Algos,  Chosen are: ", algo0, algo1)
     return game_settings
 
 
@@ -533,9 +591,9 @@ if __name__ == "__main__":
     game_settings = init_game_settings_random(ALGO, ALGO_BASELINES, "human", ALL_LAYOUTS, "bc")
     print(game_settings)
     # set_agent_pair(AGENT_SETTINGS[ARGS.default][0], AGENT_SETTINGS[ARGS.default][1], LAYOUT_SETTINGS[str(ARGS.default)])
-    print("----------- load agents success! -----------")
-    print(AGENTS)
-    print("---------------------------")
+    # print("----------- load agents success! -----------")
+    # print(AGENTS)
+    # print("---------------------------")
 
     # TODO: client should pick layout name, instead of server?
     # currently both client/server pick layout name, and they must match

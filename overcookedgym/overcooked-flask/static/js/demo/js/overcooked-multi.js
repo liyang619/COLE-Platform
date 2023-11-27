@@ -53,6 +53,7 @@ export default class OvercookedMultiPlayerTask {
         this.player_index = player_index;
         this.algo = algo;
 
+
         let player_colors = this.getHatColor();
 
         this.game = new OvercookedGame({
@@ -111,6 +112,7 @@ export default class OvercookedMultiPlayerTask {
         var agent_type = this.getAgentType()
         console.log('agent_settings', agent_settings[agent_type])
         var player_agents = agent_settings[agent_type]['agents']
+        this.index = player_agents % 2
         var ai = player_agents[0] === 'human' ? player_agents[1] : player_agents[0]
         var layout = agent_settings[agent_type].layout
         this.gameloop = setInterval(() => {
@@ -121,23 +123,32 @@ export default class OvercookedMultiPlayerTask {
                 // http://10.10.9.30:8089/random0/MEP/predict/
                 // http://10.10.9.30:8088/simple/COLE/predict/
                 // let predicStr = '/predict/'
-                let url = 'http://0.0.0.0/humanplay/'
+                let url = agent_settings[agent_type].url
+                let opp_index = player_agents + 1 - 2 * (player_agents % 2)
+                // console.log(urrl)
+                // let url = 'http://localhost:8088/humanplay/'
                 // let new_npc_index = !url ?  npc_index : str.slice(url.length - predicStr.length + 1, url.length - predicStr.length)
                 // let apiUrl = url || "/predict"
+                // console.log(0)
+                // console.log(this.index)
+                // console.log(this.joint_action)
+                // console.log(this.joint_action[this.index])
                 xhr.open("POST", url, false);
                 // xhr.open("POST", "/" + layout + "/" + ai +"/predict/", false); // false for synchronous
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.send(JSON.stringify({
+                    action: this.joint_action[this.index],
                     state: this.state,
                     // npc_index: npc_index,
-                    npc_index: player_agents[0] === 'human' ? 1 : 0,
+                    index: opp_index,
                     layout_name: this.layout_name,
                     algo: this.algo,
                     timestep: this.cur_gameloop
                 }));
+                console.log(1)
                 var action_idx = JSON.parse(xhr.responseText)["action"];
                 let npc_a = Action.INDEX_TO_ACTION[action_idx];
-                // console.log(npc_a);
+                console.log(2);
 
                 // this.lstm_state[npc_index] = lstm_state;
                 this.joint_action[npc_index] = npc_a;
@@ -190,6 +201,7 @@ export default class OvercookedMultiPlayerTask {
             this.state = next_state;
             this.joint_action = [STAY, STAY];
             this.cur_gameloop += 1;
+            console.log("activate")
             this.activate_response_listener();
 
             //time run out
@@ -276,6 +288,7 @@ export default class OvercookedMultiPlayerTask {
     activate_response_listener() {
         $(document).on("keydown", (e) => {
             let action;
+            console.log(e)
             switch (e.which) {
                 case 37: // left
                     action = WEST;
@@ -315,7 +328,13 @@ export default class OvercookedMultiPlayerTask {
         let level = agent_type ? Number(agent_type) + 1 : 0
         return level
       }
-      getAgentSettings() {
+      getAgentSettings() {        let colorMap = {
+        'SP': 'blue',
+        'PBT': 'green',
+        'FCP': 'red',
+        'MEP': 'purple',
+        'COLE': 'orange'
+      }
         let agent_settings = JSON.parse(sessionStorage.getItem('game_setting_list')) || []
         return agent_settings
       }
@@ -347,32 +366,32 @@ export default class OvercookedMultiPlayerTask {
         let players = agent_settings[agent_type]['agents'];
         let ai_type;
         let human_idx, ai_idx;
-        if (players[0] == 'human') {
-          human_idx = 0;
-          ai_idx = 1;
-          ai_type = players[1];
+        if (players % 2 == 0) {
+            human_idx = 0;
+            ai_idx = 1;
+        } else {
+            human_idx = 1;
+            ai_idx = 0;
         }
-        else if (players[1] == 'human') {
-          human_idx = 1;
-          ai_idx = 0;
-          ai_type = players[0];
-        }
-        else {
-          throw ("Unexpected agent type: " + players.toString());
-        }
+        // if (players[0] == 'human') {
+        //   human_idx = 0;
+        //   ai_idx = 1;
+        //   ai_type = players[1];
+        // }
+        // else if (players[1] == 'human') {
+        //   human_idx = 1;
+        //   ai_idx = 0;
+        //   ai_type = players[0];
+        // }
+        // else {
+        //   throw ("Unexpected agent type: " + players.toString());
+        // }
         // let ai_players = game_setting_list[]
         let colors = { 0: 'white', 1: 'red' };
         let human_color = 'gray';
-        let colorMap = {
-          'SP': 'blue',
-          'PBT': 'green',
-          'FCP': 'red',
-          'MEP': 'purple',
-          'COLE': 'orange'
-        }
         var agent_colors = {};
         agent_colors[human_idx] = human_color;
-        agent_colors[ai_idx] = colorMap[ai_type] || 'blue';
+        agent_colors[ai_idx] = 'blue';
         return agent_colors
       }
 }
