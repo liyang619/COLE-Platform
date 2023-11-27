@@ -1,24 +1,9 @@
 # README
+This branch contains these features:
+- Human-Human Play.
+- Design and playing with LLM Agent.
 
-Welcome to the official GitHub repository for the research paper "Tackling Cooperative Incompatibility for Zero-Shot Human-AI Coordination". This paper, submitted to the Special Track on Hybrid Human-Artificial Intelligence in the Journal of Artificial Intelligence Research (JAIR), is an extension of the paper [Cooperative Open-ended Learning Framework for Zero-shot Coordination](https://arxiv.org/abs/2302.04831), which was accepted by ICML 2023.
-
-You can access our hands-on [demo page](https://sites.google.com/view/cole-jair).
-
-This repository introduces a human-AI evaluation platform built around the Overcooked game, designed to support Human-AI experiments. Overcooked, a two-player fully cooperative game. The system is shown as follows.
-
-<p align="center">
-  <img src="./images/system_model.png" width="90%">
-  <br>
-</p>
-Here, you're granted the ability to:
-
-- Upload your weights
-- Customize the human questionnaire
-- Configure game settings
-- And many more!
-
-Our codebase is a modified version of the [PECAN](https://github.com/LxzGordon/PECAN) repository, adapted to better suit our specific research needs. Besides, we integrate [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) agent models with the [PantheonRL](https://github.com/Stanford-ILIAD/PantheonRL) framework for convenient human-ai coordination study on Overcooked. Changes are done under the [overcookedgym/overcooked-flask](https://github.com/LxzGordon/pecan_human_AI_coordination/tree/master/overcookedgym/overcooked-flask) directory.
-
+**Attention**: If you've finish the "How to setup" part of main branch. You don't need to redo that. However, **you need to rerun the npm build command**, as there are some changes from the main branch.**
 # Getting Started
 
 ## 1. How to setup
@@ -53,14 +38,6 @@ Install human_aware_rl and its dependencies: overcooked_ai, baselines & stable_b
     cd baselines
     pip install -e .
 ```
-
-### Update at June 6th, 2023
-Now we have synced all the changes to the unbuilt files, and added instructions on how to build them using npm. So we removed the big built files to reduce the repository size.
-
-Here are instructions for building.
-
-You need to firstly install npm (if you can't do this, you can checkout our history version to get all built files)
-
 In `overcookedgym/human_aware_rl/overcooked_ai/overcooked_ai_js`, run
 ```shell
 npm install
@@ -85,75 +62,22 @@ npm link ../human_aware_rl/overcooked_ai/overcooked_ai_js/
 npm run build
 ```
 
-
-
-
-## 2. How to load models
-
-You need to put your model file in `./models`. You can get our trained models [here](https://drive.google.com/drive/folders/1s88a_muyG6pVlfcKDKop6R1Fhxr8dcGH?usp=share_link), including BC, self-play, population-based training, [FCP](https://arxiv.org/abs/2110.08176), [MEP](https://arxiv.org/abs/2112.11701), [COLE](https://arxiv.org/abs/2302.04831).
-
-Also, you need to put this BC [data](https://drive.google.com/drive/folders/1gawHatRHkYor_J520uWgoQucqxwVPZwc?usp=drive_link) in `./data`.
-
-**Note:** The layout names in code and google drive are not aligned with the layout names in those papers. Here is the mapping:
-
-```code
-PYTHON_LAYOUT_NAME_TO_ENV_NAME = {
-    "unident_s": "Asymmetric Advantages",
-    "simple": "Cramped Room",
-    "random1": "Coordination Ring",
-    "random0": "Forced Coordination",
-    "random3": "Counter Circuit"
-}
-```
-
-In addition, you can load your own models if they are trained using the [Human-Aware-RL](https://github.com/HumanCompatibleAI/human_aware_rl/tree/neurips2019) framework. 
-Agents are loaded using the `get_agent_from_saved_model()` method, which loads tensorflow predictor models (`.pb` files), so you should save your agents in this style if you wish to load them into our framework. You can reference to the `save` method in `human_aware_rl/pbt/pbt.py` for saving agents that can be loaded.
-
-To load your own models, you need to put them in the `./models` folder in a named folder (the folder names need to be the same for all layouts), and the models would be loaded upon starting the server. For example. If your algo is named `ABC`, then the folder structure should look like this:
-```
--- models
-  | --  simple
-       | -- SP        <---- Baseline 1 
-       | -- PBT       <---- Baseline 2
-          ...
-       | -- ABC       <---- Your Algorithm
-  | --  unident_s
-       | -- SP        <---- Baseline 1 
-       | -- PBT       <---- Baseline 2
-          ...
-       | -- ABC       <---- Your Algorithm
-  | --  random1
-       | -- SP        <---- Baseline 1 
-       | -- PBT       <---- Baseline 2
-          ...
-       | -- ABC       <---- Your Algorithm
-  ...
-``` 
-
 ## 3. How to run
 
+To run a human-human play, run:
 ```shell
-python overcookedgym/overcooked-flask/app.py --trajs_savepath ./trajs --ckpts ./models
+python overcookedgym/overcooked-flask/app_human.py
 ```
 
-- `--ckpts`: Folder containing all the AI models to be loaded. Default is `./models`.
-- `--port`: The port where you run the server process.
-- `--trajs_savepath`: Optional trajectory save path, default is `./trajs`.
-- `--questionnaire_savepath`: Optional questionnaire save path, default is `./questionnaire`.
-- `--ip`: Default is LOCALHOST, we **recommend you replace it with your public network IP**, because of a known bug of Flask that may cause extreme lag when playing the game. The same applies when debugging, you should visit your machine's IP in your browser instead of LOCALHOST.
+The game is on http://127.0.0.1:8088
+The game will start when two browser windows are all ready.
 
-## 4. How to customize
-
-### Customize experiment statements
-You can replace `configs/statement.md` by your experiment statement markdown file, then restarting your web process.
-
-### Customize before game questionnaire.
-You can modify `configs/before_game.yaml` to customize your settings of before game questionnaire.
-
-## 5. How to collect data
-Questionnaire data are saved in `./questionnaire`, its corresponging co-play trajectorys is saved in `./trajs`.
-
-We also privide a simple data processing scripts named `questionnaire_analyze.ipynb.`
+To play with LLM agent, run:
+```shell
+python overcookedgym/overcooked-flask/app_llm.py
+```
+You may need to fill your open-ai api key in app_llm.py and modify the prompt.txt to use your own prompt.
+For deep customize, please refer the code of LLMBot and LLMAgent in app_llm.py.
 
 # License
 [MIT License](LICENSE.md)
