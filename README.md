@@ -82,6 +82,8 @@ Here are instructions for building using npm.
 
 You need to firstly install npm (if you can't do this, you can checkout our history version to get all built files)
 
+**If you want to utilize human-human play or llm agents, please refer to `human` branch and remember that you need to re-run `npm run build` in `overcookedgym/overcooked-flask`**
+
 In `overcookedgym/human_aware_rl/overcooked_ai/overcooked_ai_js`, run
 ```shell
 npm install
