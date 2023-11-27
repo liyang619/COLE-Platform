@@ -5,8 +5,8 @@ You can access our hands-on [demo page](https://sites.google.com/view/cole-jair)
 Below, you'll find a list of distinct features that our repository offers.
 
 <span style="color:red;">Update: New Features are Available:</span> 
-- 1. Support Human-Human Experiments 
-- 2. Play with LLM Agent like GPT-4 (main branch) 
+- 1. Support Human-Human Experiments (human branch)
+- 2. Play with LLM Agent like GPT-4 (human branch) 
 - 3. Training your own COLE_SV agent (cole_training branch) 
 - 4. ZSC baseline agents including SP, FCP, PBT, MEP (baseline_training branch).
 
@@ -20,9 +20,11 @@ Here, you're granted the ability to:
 - Customize the human questionnaire (main branch)
 - Configure game settings (main branch)
 - Human-Human Play (human branch)
-- Play with LLM agent like gpt-4 (main branch)
+- Play with LLM agent like gpt-4 (human branch)
 - Training your own COLE_SV agent (cole_training branch) and ZSC baseline agents including SP, FCP, PBT, MEP (baseline_training branch)
 - And many more!
+
+The usage of each ability, please refer to the corresponding branch.
 
 
 This repository introduces a human-AI evaluation platform built around the Overcooked game, designed to support Human-AI experiments. Overcooked, a two-player fully cooperative game. The system is shown as follows.
@@ -36,7 +38,7 @@ Here, you're granted the ability to:
 - Upload your weights (main branch)
 - Customize the human questionnaire (main branch)
 - Configure game settings (main branch)
-- Play with LLM agent like gpt-4 (main branch)
+- Play with LLM agent like gpt-4 (human branch)
 - Training your own COLE_SV agent (cole branch) and ZSC baseline agents including SP, FCP, PBT, MEP (baseline branch)
 - And many more!
 
