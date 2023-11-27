@@ -3,7 +3,7 @@ This branch contains these features:
 - Human-Human Play.
 - Design and playing with LLM Agent.
 
-**Attention**: If you've finish the "How to setup" part of main branch. You don't need to redo that. However, **you need to rerun the ``npm run build`` command**, as there are some changes from the main branch.
+**Attention**: If you've finish the "How to setup" part of main branch, you don't need to redo that. However, **you need to rerun the ``npm run build`` command**, as there are some changes from the main branch.
 # Getting Started
 
 ## 1. How to setup
