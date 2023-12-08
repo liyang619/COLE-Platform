@@ -46,17 +46,3 @@ def Shapley_Value(payoffs, grand_coalition, mc_times=200):
 
     print("MC based Shapley value algorithm costs {:.3f} seconds.".format(time.time() - start_time))
     return SV
-
-
-if __name__=="__main__":
-    import pandas as pd
-    payoffs = np.array(pd.read_csv("/home/liyang/HARL/human_aware_rl/data/game_shapley/pbt_random1/seed_4221/pos_agent0/pbt_iter17/neg_payoffs.csv", header=None))
-    coalitions = list(range(10))
-    a = payoffs[34-10:34,34-10:34]
-    print(a)
-    x = Shapley_Value(a, coalitions)
-    print(x)
-    from utils import exp_prob
-    x = normalization(x)
-    x = exp_prob(-x, t=10)
-    print(x)
