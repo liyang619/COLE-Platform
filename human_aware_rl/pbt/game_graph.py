@@ -82,20 +82,3 @@ class GameGraph():
         eta = 1 - eta
         return eta
 
-if __name__=="__main__":
-    import pandas as pd
-    payoffs = np.array(pd.read_csv("/home/liyang/HARL/human_aware_rl/data/game_shapley/pbt_random1/seed_4221/pos_agent0/pbt_iter17/neg_payoffs.csv", header=None))
-    coalitions = list(range(35))
-    G = GameGraph(payoffs[:35,:35], coalitions)
-    wpr = G.inv_WPR()
-    print(wpr)
-
-    # payoffs = np.array(pd.read_csv("/Users/yang/Documents/PhD/project/cooperative_psro/code/HARL/human_aware_rl/data/events/neg_payoffs1.csv", header=None))
-    # coalitions = list(range(36))
-    # G = GameGraph(payoffs.T, coalitions)
-    # wpr = G.WPR()
-    # inD = G.in_degree()
-    # top_indices = np.argsort(wpr)[::-1][:15]
-    # print(top_indices)
-    # top_indices = np.argsort(inD)[::-1][:15]
-    # print(top_indices)
