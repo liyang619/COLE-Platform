@@ -56,7 +56,7 @@ bash experiments/pbt_experiments.sh
 `FCP`:
 ```
 bash experiments/train_population.sh
-bash exoerunebts/fcp_train.sh
+bash experiments/fcp_train.sh
 ```
 
 `MEP`:
